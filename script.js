@@ -360,6 +360,56 @@ function showNotification(message, type) {
   }, 3000);
 }
 
+// Theme toggle functionality
+function setupThemeToggle() {
+  const themeToggle = document.getElementById('themeToggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeIcon(theme);
+  }
+  
+  function updateThemeIcon(theme) {
+    const icon = themeToggle.querySelector('i');
+    if (theme === 'dark') {
+      icon.className = 'ri-sun-line';
+    } else if (theme === 'light') {
+      icon.className = 'ri-moon-line';
+    } else {
+      icon.className = prefersDark.matches ? 'ri-sun-line' : 'ri-moon-line';
+    }
+  }
+  
+  // Initialize theme
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    updateThemeIcon('system');
+  }
+  
+  // Theme toggle click handler
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (!currentTheme || currentTheme === 'system') {
+      setTheme(prefersDark.matches ? 'light' : 'dark');
+    } else if (currentTheme === 'dark') {
+      setTheme('light');
+    } else {
+      setTheme('dark');
+    }
+  });
+  
+  // Listen for system theme changes
+  prefersDark.addEventListener('change', (e) => {
+    if (!document.documentElement.getAttribute('data-theme')) {
+      updateThemeIcon('system');
+    }
+  });
+}
+
 // Initialize all functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   setupMobileMenu();
@@ -368,4 +418,5 @@ document.addEventListener('DOMContentLoaded', function() {
   setupAnimations();
   setupPortfolioScroll();
   setupContactForm();
+  setupThemeToggle();
 });
